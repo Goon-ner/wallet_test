@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17
+    container_name: wallets_postgres
+    environment:
+      POSTGRES_DB: wallets
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - walletnet
+
+  app:
+    image: wallet:latest
+    container_name: wallet_spring
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/wallets
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - db
+    networks:
+      - walletnet
+
+volumes:
+  db_data:
+
+networks:
+  walletnet:
